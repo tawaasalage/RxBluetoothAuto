@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\exploded-aar\com.github.ivbaranov\rxbluetooth\0.1.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="13f1c7e69e20a651130a8d35ed21895ab13ad45b">
+        <dex dex="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\pre-dexed\debug\classes-5e6730b3d12be68780ce28426a3d4e34d79ec970.jar" />
+    </item>
+
+</items>
