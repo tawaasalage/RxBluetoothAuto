@@ -1,5 +1,7 @@
 # RxBluetoothAuto
 
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-RxBluetoothAuto-green.svg?style=true)](https://android-arsenal.com/details/3/3911)
+
 This project contains sample code for Bluetooth communication
 
 This includes 
