@@ -2,11 +2,88 @@
 <items version="2" >
 
     <item
+        jar="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\exploded-aar\io.reactivex\rxandroid\1.2.1\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="5a2386ad9bfff580b206a7fe305cdccd00798159">
+        <dex dex="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\pre-dexed\debug\classes-ede164ead600806ee31be93ebdbaaa58c2ec24dd.jar" />
+    </item>
+    <item
+        jar="C:\Users\DILAN\.gradle\caches\modules-2\files-2.1\io.reactivex\rxjava\1.1.6\2586312cd2b8a511e4c6236736f5a039fc0f2273\rxjava-1.1.6.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="2586312cd2b8a511e4c6236736f5a039fc0f2273">
+        <dex dex="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\pre-dexed\debug\rxjava-1.1.6-d133283f9f2d9ade69f82c9e003d260a60e27858.jar" />
+    </item>
+    <item
+        jar="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\exploded-aar\com.android.support\support-v4\24.0.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="2f7e6e2dad1bccaf68a8820820adc6c0d5b96d37">
+        <dex dex="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\pre-dexed\debug\classes-b99383deb9df8d063451623c5d8f44f9c6783e26.jar" />
+    </item>
+    <item
+        jar="C:\Users\DILAN\Desktop\APEX\ADT Bundles\adt-bundle-windows-x86_64-20140702\sdk\extras\android\m2repository\com\android\support\support-annotations\24.0.0\support-annotations-24.0.0.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="2943c74db6d4346ab8c6531adac91fa05c137c40">
+        <dex dex="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\pre-dexed\debug\support-annotations-24.0.0-26182b7c88ca072a6cbddb07a6e8bd74bb618120.jar" />
+    </item>
+    <item
+        jar="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\exploded-aar\com.polidea.rxandroidble\rxandroidble\1.0.1\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="9a034205eccb8194c176e8a4ed4a192a7c6300dc">
+        <dex dex="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\pre-dexed\debug\classes-e3ec05f14b15faba3fd387f73cf4045f908563ae.jar" />
+    </item>
+    <item
+        jar="C:\Users\DILAN\.gradle\caches\modules-2\files-2.1\com.jakewharton\butterknife\7.0.1\d5d13ea991eab0252e3710e5df3d6a9d4b21d461\butterknife-7.0.1.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="d5d13ea991eab0252e3710e5df3d6a9d4b21d461">
+        <dex dex="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\pre-dexed\debug\butterknife-7.0.1-d4fae1a59787c8de93270fa3532d100370a713d6.jar" />
+    </item>
+    <item
+        jar="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\exploded-aar\com.jakewharton.rxbinding\rxbinding\0.3.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="023a79c3bbea624387e820cb2b4d5c6ba774903c">
+        <dex dex="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\pre-dexed\debug\classes-9c3b75494f33aaf6a87e5f43f9681b87933b73de.jar" />
+    </item>
+    <item
         jar="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\exploded-aar\com.github.ivbaranov\rxbluetooth\0.1.0\jars\classes.jar"
         jumboMode="false"
         revision="23.0.2"
         sha1="13f1c7e69e20a651130a8d35ed21895ab13ad45b">
         <dex dex="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\pre-dexed\debug\classes-5e6730b3d12be68780ce28426a3d4e34d79ec970.jar" />
+    </item>
+    <item
+        jar="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\exploded-aar\com.android.support\support-v4\24.0.0\jars\libs\internal_impl-24.0.0.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="fcaf463e10e69c1923ccf1edeba3b4196d239e00">
+        <dex dex="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\pre-dexed\debug\internal_impl-24.0.0-529e23748cd21874b5a39b4043ea14368b07d689.jar" />
+    </item>
+    <item
+        jar="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\24.0.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="e70f608219ed6b974644c333249ab2bb7b71de98">
+        <dex dex="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\pre-dexed\debug\classes-9312afd88ac7dbe9b620cb5f036d601042f35cda.jar" />
+    </item>
+    <item
+        jar="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\24.0.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="3bd97cfefd783e9de1dd1c30574a6adb44b4409b">
+        <dex dex="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\pre-dexed\debug\classes-b689ffd71dd39e7cc2f2c87438cfc531619a011a.jar" />
+    </item>
+    <item
+        jar="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\24.0.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="0874286cc2fd88d54fdf130e9d5372730da6de97">
+        <dex dex="D:\GooglePlacesApiTutorial-master\RXBLE\app\build\intermediates\pre-dexed\debug\classes-9af682c89ae970748c93b613be7afdc34843f89f.jar" />
     </item>
 
 </items>

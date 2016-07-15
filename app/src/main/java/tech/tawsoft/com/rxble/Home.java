@@ -1,9 +1,25 @@
 package tech.tawsoft.com.rxble;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.IsoDep;
+import android.nfc.tech.MifareClassic;
+import android.nfc.tech.MifareUltralight;
+import android.nfc.tech.Ndef;
+import android.nfc.tech.NfcA;
+import android.nfc.tech.NfcB;
+import android.nfc.tech.NfcF;
+import android.nfc.tech.NfcV;
+import android.os.AsyncTask;
 import android.os.ParcelUuid;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,6 +37,13 @@ import com.polidea.rxandroidble.RxBleClient;
 
 import com.polidea.rxandroidble.RxBleScanResult;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -46,6 +69,7 @@ public class Home extends Activity {
     private Subscription bluetoothreadDataSubscription;
     private Subscription bluetoothConnectionSubscription;
     private Subscription reconnectionnSubscription;
+    private Subscription nfcSubscription;
 
     BluetoothSocket bSocket;
 
@@ -61,7 +85,116 @@ public class Home extends Activity {
     @Bind(R.id.lblValue)
     TextView lblValue;
 
+    @Bind(R.id.lblNFCID)
+    TextView lblNFCID;
+
+    byte [] data=new byte[16];
+    int count=0;
+    String value="";
+
+
+    // list of NFC technologies detected:
+    private final String[][] techList = new String[][] {
+            new String[] {
+                    NfcA.class.getName(),
+                    NfcB.class.getName(),
+                    NfcF.class.getName(),
+                    NfcV.class.getName(),
+                    IsoDep.class.getName(),
+                    MifareClassic.class.getName(),
+                    MifareUltralight.class.getName(), Ndef.class.getName()
+            }
+    };
+
     BluetoothDevice bluetoothDev;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(NfcAdapter.ACTION_TAG_DISCOVERED);
+        filter.addAction(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        filter.addAction(NfcAdapter.ACTION_TECH_DISCOVERED);
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, new IntentFilter[]{filter}, this.techList);
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // disabling foreground dispatch:
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        nfcAdapter.disableForegroundDispatch(this);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        if (intent.getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)) {
+
+            String type = intent.getType();
+            Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            nfcReader(tag);
+            lblNFCID.setText("Tag Detected");
+        }
+    }
+
+    public String nfcRead(Tag t)
+    {
+        Tag tag = t;
+        Ndef ndef = Ndef.get(tag);
+        if (ndef == null) {
+            return null;
+        }
+        NdefMessage ndefMessage = ndef.getCachedNdefMessage();
+        NdefRecord[] records = ndefMessage.getRecords();
+        for (NdefRecord ndefRecord : records)
+        {
+            if (ndefRecord.getTnf() == NdefRecord.TNF_WELL_KNOWN && Arrays.equals(ndefRecord.getType(), NdefRecord.RTD_TEXT))
+            {
+                try {return readText(ndefRecord);} catch (UnsupportedEncodingException e) {}
+            }
+        }
+
+        return null;
+
+    }
+
+    private String readText(NdefRecord record) throws UnsupportedEncodingException {
+        byte[] payload = record.getPayload();
+        String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
+        int languageCodeLength = payload[0] & 0063;
+        return new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
+    }
+
+    public void nfcReader(Tag tag)
+    {
+        nfcSubscription=Observable.just(nfcRead(tag))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(String s) {
+                        if (s != null) {
+                            lblNFCID.setText(s);
+                        }
+                    }
+                });
+    }
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,8 +240,7 @@ public class Home extends Activity {
             bluetoothStateOtherSubscription = rxBluetooth.observeBluetoothState()
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.computation())
-                    .filter(Action.isEqualTo(BluetoothAdapter.STATE_OFF, BluetoothAdapter.STATE_TURNING_OFF,
-                            BluetoothAdapter.STATE_TURNING_ON))
+                    .filter(Action.isEqualTo(BluetoothAdapter.STATE_OFF, BluetoothAdapter.STATE_TURNING_OFF,BluetoothAdapter.STATE_TURNING_ON))
                     .subscribe(new Action1<Integer>() {
                         @Override
                         public void call(Integer integer) {
@@ -247,66 +379,97 @@ public class Home extends Activity {
         if(bluetoothDev==null)
         {
             Log.d("DeviceInfoDevice", "Null Device");
-
         }
         else
         {
-            UUID uuid;
-            String uuidS="";
-            ParcelUuid [] puuid=bluetoothDev.getUuids();
-            for (ParcelUuid u:puuid)
-            {
-                uuidS=u.getUuid().toString();
-            }
-            uuid = UUID.fromString(uuidS);
 
-            bluetoothConnectionSubscription=rxBluetooth.observeConnectDevice(bluetoothDev,uuid )
-                    .observeOn(AndroidSchedulers.mainThread())
+            UUID uuid = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
+
+            bluetoothConnectionSubscription=Observable.just(getConnection(bluetoothDev))
+            .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
-                    .subscribe(new Action1<BluetoothSocket>() {
+                    .subscribe(new Observer<Boolean>() {
                         @Override
-                        public void call(BluetoothSocket bluetoothSocket) {
-                            bSocket = bluetoothSocket;
-                            Log.d("DeviceInfoList", "Connection Success ");
-                            readData();
+                        public void onCompleted() {
+
                         }
-                    }, new Action1<Throwable>() {
+
                         @Override
-                        public void call(Throwable throwable) {
-                            Log.d("DeviceInfoList", "Connection Faileds " + throwable.getMessage());
+                        public void onError(Throwable e) {
 
-                            reconnectionnSubscription=Observable.timer(3, TimeUnit.SECONDS)
-                                     .subscribe(new Observer<Long>() {
-                                         @Override
-                                         public void onCompleted() {
-                                             Log.d("DeviceInfoRe","Called again");
-                                             ConnectFunc();
+                        }
 
-                                         }
+                        @Override
+                        public void onNext(Boolean aBoolean) {
 
-                                         @Override
-                                         public void onError(Throwable e) {
-
-                                         }
-
-                                         @Override
-                                         public void onNext(Long number) {
-
-                                         }
-                                     });
-
+                            if(aBoolean)
+                            {
+                                readData();
+                            }
+                            else
+                            {
+                                reconnect();
+                            }
                         }
                     });
 
-
         }
     }
+
+    public void reconnect()
+    {
+        reconnectionnSubscription = Observable.timer(3, TimeUnit.SECONDS)
+                .subscribe(new Observer<Long>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d("DeviceInfoRe", "Called again");
+                        ConnectFunc();
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Long number) {
+
+                    }
+                });
+    }
+    public boolean getConnection(BluetoothDevice device)
+    {
+        UUID SERIAL_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"); // bluetooth serial port service
+        try {
+            bSocket = device.createRfcommSocketToServiceRecord(SERIAL_UUID);
+        } catch (Exception e) {Log.e("","Error creating socket");}
+
+        try {
+            bSocket.connect();
+            return true;
+
+        } catch (IOException e) {
+            Log.e("",e.getMessage());
+            try {
+                bSocket =(BluetoothSocket) device.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(device,1);
+                bSocket.connect();
+                return true;
+            }
+            catch (Exception e2) {
+               return false;
+            }
+        }
+
+    }
+
 
     public void readData()
     {
         BluetoothConnection bluetoothConnection=null;
         try {
             bluetoothConnection = new BluetoothConnection(bSocket);
+
         }
         catch (Exception e)
         {
@@ -314,6 +477,9 @@ public class Home extends Activity {
         }
 
         if(bluetoothConnection!=null) {
+
+            //Read Strings
+
             bluetoothreadDataSubscription=bluetoothConnection.observeStringStream()
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
@@ -321,7 +487,7 @@ public class Home extends Activity {
                         @Override
                         public void call(String string) {
 
-                            String contents =string;
+                            String contents = string;
 
                             Log.d("DeviceInfoListData", contents);
                             try{
@@ -367,9 +533,70 @@ public class Home extends Activity {
                             ConnectFunc();
                         }
                     });
+
+           //Read Bytes
+            /*
+            bluetoothreadDataSubscription=bluetoothConnection.observeByteStream()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Action1<Byte>() {
+                        @Override
+                        public void call(Byte aByte) {
+
+                                if(count==16)
+                                {
+                                    count=0;
+                                    value=new String(data);
+
+                                    if(value.substring(0, 1).contentEquals("="))
+                                    {
+
+                                        String s = value.substring(1, 5);
+                                        s=reverse(s);
+                                        float count = Float.parseFloat(s);
+
+                                        lblValue.setText(count+"");
+                                        Log.d("ValueFinal",s);
+                                    }
+                                    else
+                                    {
+
+                                    }
+
+                                }
+                                else{
+                                    data[count]=aByte;
+                                    count++;
+                                }
+
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            lblValue.setText("Connection lost");
+                            ConnectFunc();
+                        }
+                    });
+                    */
         }
 
     }
+
+    public  String reverse(String input){
+        char[] in = input.toCharArray();
+        int begin=0;
+        int end=in.length-1;
+        char temp;
+        while(end>begin){
+            temp = in[begin];
+            in[begin]=in[end];
+            in[end] = temp;
+            end--;
+            begin++;
+        }
+        return new String(in);
+    }
+
 
     @Override protected void onDestroy() {
         super.onDestroy();
@@ -392,6 +619,7 @@ public class Home extends Activity {
         unsubscribe(bluetoothreadDataSubscription);
         unsubscribe(bluetoothConnectionSubscription);
         unsubscribe(reconnectionnSubscription);
+        unsubscribe(nfcSubscription);
     }
 
     private static void unsubscribe(Subscription subscription) {
