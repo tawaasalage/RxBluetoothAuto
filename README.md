@@ -8,3 +8,7 @@ Auto connect feature if the connection get lost,
 
 #Newly added module
 NFC read using rxAndroid is also added on this project
+
+#Usage
+In order to test this application first pair the device and click Connect button.
+You may have to change the reading algorithem
